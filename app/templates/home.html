@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <br><h1>Add product link</h1><br>
+
+    <form method="post" action="/" class="form-group">
+        <label for="link" class="h4" style="margin-left: 10px">Product link</label>
+        <input id="link" name="link" type="text"><br>
+        <button type="submit" class="btn btn-success" style="margin-left:10px">Add</button>
+    </form>
+
+</div><br>
+
+<div class="container">
+    {% for product in products %}
+        {% for item in product.item %}<br>
+            <div class="container">
+                <p class="fs-5"><b>Product name:</b> <a href="{{product.link}}" class="fs-5 fw-bolder" style="color: blue">{{item.title}}</a></p>
+                <p><b>Created date:</b> {{product.data.strftime('%d-%m-%Y')}}
+                    {% if  item.price_increase[0] == '+' %}
+                        <span style="margin:20%; color:red">Price increased: {{item.price_increase}}</span>
+                    {% else %}
+                        <span style="margin:20%; color:green">Price decreased: {{item.price_increase}}</span>
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+        <div class="container">
+            <a class="btn btn-success" href="/view/{{product.id}}">View</a>
+            <a class="btn btn-danger" href="/delete/{{product.id}}">Delete</a><br>
+        </div>
+    {% endfor %}
+</div>
+
+<div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+{% endblock %}
