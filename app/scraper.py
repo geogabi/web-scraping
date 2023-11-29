@@ -12,7 +12,7 @@ header = {
 
 ############################ EMAG ##################################
 
-# search in html page where price is by class name and html tag
+# search in html page where price is it by class name and html tag
 def search_price(doc):
     price_html = doc.find_all('p', {'class': 'product-new-price'})[0].text
     price = f'{price_html}'.replace(',', '.').strip(' Lei').split('.')
@@ -50,76 +50,3 @@ def save_request(link):
     request = Requests(request_data=request_date, request_price=float(full_price), product_id=link.id)
     save_db(request)
     return request
-
-
-############################ ALTEX ##################################
-"""
-def search(doc):
-    price = doc.find_all('span', {'class': 'Price-int leading-none'})[1].text
-    cents = doc.find_all('sup', {'class': 'inline-block -tracking-0.33'})[1].text
-    full_price = f'{price}{cents}'.replace(',', '.')
-    return full_price
-
-class Scrapper:
-
-    @staticmethod
-    def save_link(link):
-        result = httpx.get(link, timeout=None, headers=headers)
-        doc = bs(result.text, 'html.parser')
-    
-        product_name = doc.title.text
-        full_price = search(doc)
-        date = datetime.today()
-    
-        items = Items(title=product_name, price=float(full_price), link_id=link.id)
-        save_database(items)
-        return items
-    
-    @staticmethod
-    def make_request(link):
-        result = httpx.get(link.link, timeout=None, headers=headers)
-        doc = bs(result.text, 'html.parser')
-    
-        full_price = search(doc)
-        request_date = datetime.today()
-    
-        request = Requests(request_data=request_date, request_price=float(full_price), product_id=link.id)
-        save_database(request)
-        return request
-    """
-
-############################ AMAZON ##################################
-"""
-def search(doc):
-    price = doc.find_all('span', {'class': 'Price-int leading-none'})[1].text
-    cents = doc.find_all('sup', {'class': 'inline-block -tracking-0.33'})[1].text
-    full_price = f'{price}{cents}'.replace(',', '.')
-    return full_price
-
-class Scrapper:
-
-    @staticmethod
-    def save_link(link):
-        result = httpx.get(link, timeout=None, headers=headers)
-        doc = bs(result.text, 'html.parser')
-
-        product_name = doc.title.text
-        full_price = search(doc)
-        date = datetime.today()
-
-        items = Items(title=product_name, price=float(full_price), link_id=link.id)
-        save_database(items)
-        return items
-
-    @staticmethod
-    def make_request(link):
-        result = httpx.get(link.link, timeout=None, headers=headers)
-        doc = bs(result.text, 'html.parser')
-
-        full_price = search(doc)
-        request_date = datetime.today()
-
-        request = Requests(request_data=request_date, request_price=float(full_price), product_id=link.id)
-        save_database(request)
-        return request
-    """
