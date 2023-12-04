@@ -1,11 +1,17 @@
+from .db_function import save_db
+from .models import Items, Requests, Products
+from .db_function import paginate_db
+from .initialize import scheduler
+
 import httpx
 from bs4 import BeautifulSoup as bs
-from .db_function import save_db
-from .models import Items, Requests
 import datetime
 
+
 header = {
-    "User-Agent": 'your user agent'}
+    "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                  'Chrome/119.0.0.0'
+                  'Safari/537.36'}
 
 
 ############################ EMAG ##################################
@@ -48,3 +54,14 @@ def save_request(link):
     request = Requests(request_data=request_date, request_price=float(full_price), product_id=link.id)
     save_db(request)
     return request
+
+
+# automatically create request in every Sunday
+@scheduler.task('cron', id='create_request',week="*", day_of_week='sun')
+# @scheduler.task('interval', id='create_request', seconds=60)
+def create_request():
+    print('This task is created every 7 days')
+    with scheduler.app.app_context():
+        links = paginate_db(Products)
+        for link in links:
+            save_request(link)

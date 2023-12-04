@@ -1,12 +1,13 @@
-from flask import Blueprint, render_template, flash, request, redirect, url_for
 from .models import Products, Items, Requests
 from .initialize import db
 from .scraper import save_link, save_request
+from .graphics import general_statistic, statistics, create_graphic
+from .db_function import delete_db, save_db, paginate_db
+
+from flask import Blueprint, render_template, flash, request, redirect, url_for
 from datetime import datetime
 import matplotlib
 import matplotlib.pyplot as plt
-from .graphics import general_statistic, statistics, create_graphic
-from .db_function import delete_db, save_db, paginate_db
 
 
 views = Blueprint('views', __name__)
@@ -33,13 +34,6 @@ def home():
     return render_template('home.html', products=products, items=items, requests=requests)
 
 
-@views.route('/delete/<int:id>')
-def delete(id):
-    delete_element = Products.query.filter_by(id=id).first()
-    delete_db(delete_element)
-    return redirect(url_for('.home'))
-
-
 @views.route('/view/<int:id>', methods=['POST', 'GET'])
 def view_element(id):
     products = Products.query.filter_by(id=id)
@@ -64,7 +58,7 @@ def view_element(id):
             last_request.statistic = second_st
             db.session.commit()
     except:
-        print('')
+        pass
 
     if request.method == 'POST':
         save_request(product)
@@ -75,9 +69,16 @@ def view_element(id):
 def plot(id):
     product = Products.query.filter_by(id=id)
     link = product.first()
-    week = db.paginate(db.select(Requests).filter_by(product_id=link.id).order_by(Requests.request_data))
+    weeks = db.paginate(db.select(Requests).filter_by(product_id=link.id).order_by(Requests.request_data))
 
-    y = [i.request_price for i in week]
-    x = [i.request_data.strftime('%d-%m-%Y') for i in week]
+    y = [week.request_price for week in weeks]
+    x = [week.request_data.strftime('%d-%m-%Y') for week in weeks]
 
     return create_graphic(x, y)
+
+
+@views.route('/delete/<int:id>')
+def delete(id):
+    delete_element = Products.query.filter_by(id=id).first()
+    delete_db(delete_element)
+    return redirect(url_for('.home'))
