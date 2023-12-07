@@ -1,14 +1,14 @@
 from .models import Products, Items, Requests
 from .initialize import db
 from .scraper import save_link, save_request
-from .graphics import general_statistic, statistics, create_graphic
+from .charts import product_statistic, items_statistics, create_graphic
 from .db_function import delete_db, save_db, paginate_db
+from .send_email import send_mail
 
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from datetime import datetime
 import matplotlib
 import matplotlib.pyplot as plt
-
 
 views = Blueprint('views', __name__)
 matplotlib.use('agg')
@@ -31,6 +31,13 @@ def home():
             save_db(product)
             save_link(product)
             return redirect(url_for('.home'))
+
+    for item in items:
+        if item.price_increase[0] == '-':
+            print('Sending')
+            send_mail(item.title)
+            print("Sent")
+
     return render_template('home.html', products=products, items=items, requests=requests)
 
 
@@ -45,26 +52,30 @@ def view_element(id):
     last_request = requests.first()
     last_second_request = requests.offset(1).first()
 
+    # create statistics
     try:
-        first_st = general_statistic(last_request.request_price, price.price)
+        first_st = product_statistic(last_request.request_price, price.price)
         price.price_increase = first_st
         db.session.commit()
         try:
-            second_st = statistics(last_request.request_price, last_second_request.request_price)
+            second_st = items_statistics(last_request.request_price, last_second_request.request_price)
             last_request.statistic = second_st
             db.session.commit()
         except:
-            second_st = statistics(last_request.request_price, price.price)
+            second_st = items_statistics(last_request.request_price, price.price)
             last_request.statistic = second_st
             db.session.commit()
-    except:
-        pass
+    except Exception as e:
+        print(e)
+        return None
 
     if request.method == 'POST':
         save_request(product)
+
     return render_template('view.html', products=products, requests=requests, id=id, price=price)
 
 
+# display charts
 @views.route('/plot.png/<int:id>')
 def plot(id):
     product = Products.query.filter_by(id=id)
@@ -81,4 +92,5 @@ def plot(id):
 def delete(id):
     delete_element = Products.query.filter_by(id=id).first()
     delete_db(delete_element)
+
     return redirect(url_for('.home'))
