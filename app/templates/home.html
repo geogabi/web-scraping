@@ -22,7 +22,7 @@
             <div class="container">
                 <p class="fs-5"><b>Product name:</b> <a href="{{product.link}}" class="fs-5 fw-bolder" style="color: blue">{{item.title}}</a></p>
                 <p><b>Created date:</b> {{product.data.strftime('%d-%m-%Y')}}
-                    {% if  item.price_increase[0] == '+' %}
+                    {% if item.price_increase[0] == '+' %}
                         <span style="margin:20%; color:red">Price increased: {{item.price_increase}}</span>
                     {% else %}
                         <span style="margin:20%; color:green">Price decreased: {{item.price_increase}}</span>
