@@ -16,12 +16,17 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_name}'
     app.config['SECRET_KEY'] = 'secret'
 
+    # set db to app
     db.init_app(app)
-    scheduler.init_app(app)         # to set a schedule
-    migrate.init_app(app, db)       # to make migrations for db
 
+    # set migrations to app
+    migrate.init_app(app, db)  # to make migrations for db
+
+    # set a schedule
+    scheduler.init_app(app)         # to set a schedule
     scheduler.start()
 
+    # config email sender to app
     config_email(app)
     mail.init_app(app)              # to send a mail
 
@@ -41,6 +46,7 @@ def create_database(app):
         print('Created database')
 
 
+# email configurations
 def config_email(app):
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 465

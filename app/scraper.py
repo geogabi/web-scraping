@@ -8,7 +8,9 @@ from bs4 import BeautifulSoup as bs
 import datetime
 
 header = {
-    "User-Agent": 'your user agent'}
+    "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                  'Chrome/119.0.0.0'
+                  'Safari/537.36'}
 
 
 ############################ EMAG ##################################
@@ -44,7 +46,7 @@ def save_link(link):
     return items
 
 
-# save the completed request
+# save the request in db
 def save_request(link):
     doc = get_doc(link)
 
@@ -56,7 +58,7 @@ def save_request(link):
     return request
 
 
-# automatically create request in every Sunday and save it
+# automatically create requests in every Sunday and save it
 @scheduler.task('cron', id='create_request', week="*", day_of_week='sun')
 def create_request():
     print('This task is created on every Sunday')
@@ -68,6 +70,8 @@ def create_request():
 
 
 
+
+##################################################################################################################
 
 # @scheduler.task('interval', id='create_request', seconds=60)
 

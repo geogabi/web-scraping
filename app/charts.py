@@ -20,7 +20,7 @@ def product_statistic(new_number, previous_number):
         return f'+{percent}%'
 
 
-# Create statistics for every item base by every price
+# Create statistics for every requests
 def items_statistics(new_number, previous_number):
     if new_number > previous_number:
         x = abs(new_number - previous_number)

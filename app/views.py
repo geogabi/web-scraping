@@ -3,7 +3,7 @@ from .initialize import db
 from .scraper import save_link, save_request
 from .charts import product_statistic, items_statistics, create_graphic
 from .db_function import delete_db, save_db, paginate_db
-from .send_email import send_mail
+from .email import send_mail
 
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from datetime import datetime
@@ -21,6 +21,7 @@ def home():
     items = paginate_db(Items)
     requests = paginate_db(Requests)
 
+# read the link from webpage and save in db
     if request.method == 'POST':
         product_link = request.form['link']
         product_found = Products.query.filter_by(link=product_link).first()
@@ -32,6 +33,7 @@ def home():
             save_link(product)
             return redirect(url_for('.home'))
 
+# send email
     for item in items:
         if item.price_increase[0] == '-':
             print('Sending')
@@ -54,10 +56,12 @@ def view_element(id):
 
     # create statistics
     try:
+        # get general prices
         first_st = product_statistic(last_request.request_price, price.price)
         price.price_increase = first_st
         db.session.commit()
         try:
+            # get prices from requests
             second_st = items_statistics(last_request.request_price, last_second_request.request_price)
             last_request.statistic = second_st
             db.session.commit()
@@ -82,15 +86,17 @@ def plot(id):
     link = product.first()
     weeks = db.paginate(db.select(Requests).filter_by(product_id=link.id).order_by(Requests.request_data))
 
+    # create charts
     y = [week.request_price for week in weeks]
     x = [week.request_data.strftime('%d-%m-%Y') for week in weeks]
 
     return create_graphic(x, y)
 
 
+# delete a product
 @views.route('/delete/<int:id>')
-def delete(id):
-    delete_element = Products.query.filter_by(id=id).first()
+def delete(_id):
+    delete_element = Products.query.filter_by(id=_id).first()
     delete_db(delete_element)
 
     return redirect(url_for('.home'))

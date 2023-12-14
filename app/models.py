@@ -1,6 +1,7 @@
 from .initialize import db
 
 
+# table for links
 class Products(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     link = db.Column(db.String(400), unique=True, nullable=False)
@@ -9,6 +10,7 @@ class Products(db.Model):
     requests = db.relationship('Requests', backref='requests', lazy=True)
 
 
+# table for every data about product -- price, title
 class Items(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     title = db.Column(db.String(300))
@@ -17,6 +19,7 @@ class Items(db.Model):
     link_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
+# table with all requests
 class Requests(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     request_data = db.Column(db.DateTime)
